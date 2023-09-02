@@ -1,0 +1,29 @@
+<?xml version="10.0"?>
+<launch>
+	<!--
+	# AUTHOR: CALEB WILSON (CALEBWILSON@fau.edu or cwilson15@lssu.edu)
+	# This is the launch file for the vision system for the WAMV-16 at FAU
+	# Date: 06-13-2023
+	 -->
+<!-- 1.0 cylinder.cpp pararmeters.... handles detecting and localizing cylinders like buoys and channel markers-->	
+	<!-- 1.1 Ransac Parameters for initial passthrough filter-->	
+	 	<param name="PASS_L" value="0" /> <!--passthrough filter ... default 0  -->
+	 	<param name="PASS_H" value="1.5" /> <!-- passthrough filter ... default 1.5  -->
+	<!-- 1.2 Ransac Parameters for finding Normals--> 	
+		<param name="NORM_K_SEARCH" value="50" /> <!-- estimates point noramls ... default 50  -->
+	<!-- 1.3 Ransac Parameters for finding planar segmentation--> 	
+		<param name="SEG_DIST_WEIGHT" value=".01" /> <!-- weight for noramls...default .01 -->
+		<param name="SEG_MAX_ITERATIONS" value="100" /> <!-- default ... 100  -->
+		<param name="SEG_DIST_THRESH" value=".01" /> <!--  ... default .01  -->
+	<!-- 1.4 Ransac Parameters for finding Cylinder--> 	
+		<param name="CYL_DIST_WEIGHT" value=".1" /> <!-- weight for noramls...default .1 -->
+		<param name="CYL_MAX_ITERATIONS" value="500" /> <!-- default ... 500  -->
+		<param name="CYL_DIST_THRESH" value=".01" /> <!--  ... default .01  -->
+		<param name="CYL_RADIUS_L" value=".2" /> <!--  ... default .2  -->
+		<param name="CYL_RADIUS_H" value=".4" /> <!--  ... default .4  --> 
+	<!-- 1.5 LAUNCH RANSAC script for finding Cylinder--> 
+		<node pkg="fau_vision" type="cylinder" name="cylinder" output="screen">
+	  	</node>
+  	
+<!-- X.0 LAUNCHES THE LAUNCH FILE -->	
+</launch>

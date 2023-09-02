@@ -1,0 +1,46 @@
+<launch>
+	<!-- This is the format for a comment in HTML --> 
+	<!-- Launches codes -->
+
+		<param name="x_min" value="1" /> <!-- min search region along axis -->
+		<param name="x_max" value="8" /> <!-- max search region along axis -->
+		<param name="y_min" value="-5" /> <!-- min search region along axis-->
+		<param name="y_max" value="5" /> <!-- max search region -->
+		<param name="grid_size" value=".5" /> <!-- min resolution is .25 m  -->
+		<param name="laser" value="897" /> <!-- changes by model of lidar I bet -->
+		<param name="sensitivity" value="140" /> <!-- [1-100]% sensitivity  -->
+		<param name="vehicle_dim_x" value="1" /> <!-- this is the length of the boat -->
+		<param name="vehicle_dim_y" value="1" /> <!-- this is the width of the boat -->
+		<param name="acceptance" value="70" /> <!-- set between 0-100 -->
+
+	<!-- ZED 2i LAUNCH -->
+	<include file="$(find zed_wrapper)/launch/zed2i.launch" />
+	<!--/////////////\\\\\\\\\\\\\\\///////////////\\\\\\\\\\\\\\\\//////////////\\\\\\\\\\\\\-->
+
+	<!-- VELODYNE LAUNCH -->
+	<include file="$(find velodyne_pointcloud)/launch/VLP16_points.launch" />
+	<!--/////////////\\\\\\\\\\\\\\\///////////////\\\\\\\\\\\\\\\\//////////////\\\\\\\\\\\\\-->
+
+	<!-- transfrom launch from velodyne to "grid_frame" -->
+	<node pkg="amore" type="tf_broadcast" name="tf_broadcast" output="screen">
+	</node>
+	<!--/////////////\\\\\\\\\\\\\\\///////////////\\\\\\\\\\\\\\\\//////////////\\\\\\\\\\\\\-->
+
+	<!-- SCAN LAUNCH  ##this is for the lidar and creates an occupancy grid-->
+	<node pkg="amore" type="roboboat_pp.py" name="roboboat_pp" output="screen">
+	</node>
+	<!--/////////////\\\\\\\\\\\\\\\///////////////\\\\\\\\\\\\\\\\//////////////\\\\\\\\\\\\\-->
+
+	<node pkg="amore" type="scan.py" name="scan" output="screen">
+	</node>
+
+
+	<!-- VISION LAUNCH ## OPENCV CHECKING FOR COLORS OF DETECTED OBJECTS -->
+	<node pkg="amore" type="vision.py" name="vision" output="screen">
+	</node>
+	<!--/////////////\\\\\\\\\\\\\\\///////////////\\\\\\\\\\\\\\\\//////////////\\\\\\\\\\\\\-->
+
+	<!-- save rviz rviz -->
+	<!-- <node type="rviz" name="rviz" pkg="rviz" args="-d $(find ENTER NAMEOF FILE HERE)/rviz Make_this_lidar_andyolo.rviz" / -->
+	  
+</launch>

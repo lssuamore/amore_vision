@@ -1,0 +1,8 @@
+prefix=/home/sensor_jetson/amore_vision/install
+
+Name: amore_vision
+Description: Description of amore_vision
+Version: 0.0.0
+Cflags: -I${prefix}/include
+Libs: -L${prefix}/lib 
+Requires: geographic_msgs geometry_msgs message_generation message_runtime nav_msgs roscpp rospy sensor_msgs std_msgs

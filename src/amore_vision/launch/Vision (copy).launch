@@ -1,0 +1,69 @@
+<launch>
+	<!-- This is the format for a comment in HTML --> 
+	<!-- Launches codes -->
+	
+<!-- LIDAR PARAMETERS!!!!!!!!!!!!LIDAR PARAMETERS!!!!!!!!LIDAR PARAMETERS!!!!!!!!!!!!LIDAR PARAMETERS!!!!!!!!!!!!LIDAR PARAMETERS!!!!!!!!!!!!LIDAR PARAMETERS!!!!!!!!!!!! -->
+
+		<param name="x_min" value="0" /> <!-- min search region along axis -->
+		<param name="x_max" value="20" /> <!-- max search region along axis -->
+		<param name="y_min" value="-20" /> <!-- min search region along axis-->
+		<param name="y_max" value="20" /> <!-- max search region -->
+		<param name="grid_size" value=".5" /> <!-- min resolution is .25 m  -->
+		<param name="laser" value="897" /> <!-- changes by model of lidar I bet -->
+		<param name="sensitivity" value="70" /> <!-- [1-100]% sensitivity  -->
+		<param name="vehicle_dim_x" value="1" /> <!-- this is the length of the boat -->
+		<param name="vehicle_dim_y" value="2" /> <!-- this is the width of the boat -->
+		<param name="acceptance" value="20" /> <!-- set between 0-100 -->
+		
+		
+		
+<!-- CAMERA PARAMETERS!!!!!!!!!!!!!!!CAMERA PARAMETERS!!!!!!!!!!!!!CAMERA PARAMETERS!!!!!!!!!!!!!!CAMERA PARAMETERS!!!!!!!!!!!!!CAMERA PARAMETERS!!!!!!!!!!CAMERA PARAMETERS-->
+
+	<!-- RED 1 COLOUR SPACE -->		
+		<!--             H_RED_Low_1                    S_RED_Low_1                           V_RED_Low_1-->
+		<param name="RED_H_L_1" value="0" /> <param name="RED_S_L_1" value="100" /> <param name="RED_V_L_1" value="20" />
+		<!--             H_RED_High_1                   S_RED_High_1                          V_RED_High_1-->
+		<param name="RED_H_H_1" value="10" /> <param name="RED_S_H_1" value="255" /> <param name="RED_V_H_1" value="255" />
+	<!-- RED 2 COLOUR SPACE -->
+		<!--             H_RED_Low_2                    S_RED_Low_2                           V_RED_Low_2-->
+		<param name="RED_H_L_2" value="160" /> <param name="RED_S_L_2" value="100" /> <param name="RED_V_L_2" value="20" />
+		<!--             H_RED_High_2                   S_RED_High_2                          V_RED_High_2-->
+		<param name="RED_H_H_2" value="179" /> <param name="RED_S_H_2" value="255" /> <param name="RED_V_H_2" value="255" />
+	<!-- GREEN COLOUR SPACE -->		
+		<!--             H_GREEN_Low                    S_GREEN_Low                           V_GREEN_Low-->
+		<param name="GREEN_H_L" value="40" /> <param name="GREEN_S_L" value="40" /> <param name="GREEN_V_L" value="40" />
+		<!--             H_GREEN_High                   S_GREEN_High                          V_GREEN_High-->
+		<param name="GREEN_H_H" value="85" /> <param name="GREEN_S_H" value="255" /> <param name="GREEN_V_H" value="255" />
+	<!-- WHITE COLOUR SPACE -->		
+		<!--             H_WHITE_Low                    S_WHITE_Low                           V_WHITE_Low-->
+		<param name="WHITE_H_L" value="0" /> <param name="WHITE_S_L" value="0" /> <param name="WHITE_V_L" value="215" />
+		<!--             H_WHITE_High                   S_WHITE_High                          V_WHITE_High-->
+		<param name="WHITE_H_H" value="255" /> <param name="WHITE_S_H" value="40" /> <param name="WHITE_V_H" value="255" />
+		
+
+	<!-- ZED 2i LAUNCH-->
+	<include file="$(find zed_wrapper)/launch/zed2i.launch" />
+	<!--/////////////\\\\\\\\\\\\\\\///////////////\\\\\\\\\\\\\\\\//////////////\\\\\\\\\\\\\-->
+
+	<!-- VELODYNE LAUNCH -->
+	<include file="$(find velodyne_pointcloud)/launch/VLP16_points.launch" />
+	<!--/////////////\\\\\\\\\\\\\\\///////////////\\\\\\\\\\\\\\\\//////////////\\\\\\\\\\\\\-->
+
+	<!-- transfrom launch from velodyne to "grid_frame" -->
+	<node pkg="amore" type="tf_broadcast" name="tf_broadcast" output="screen">
+	</node>
+
+	<!--/////////////\\\\\\\\\\\\\\\///////////////\\\\\\\\\\\\\\\\//////////////\\\\\\\\\\\\\-->
+
+	<node pkg="amore" type="scan.py" name="scan" output="screen">
+	</node>
+
+	<!-- VISION LAUNCH ## OPENCV CHECKING FOR COLORS OF DETECTED OBJECTS -->
+	<node pkg="amore" type="vision.py" name="vision" output="screen">
+	</node>
+	<!--/////////////\\\\\\\\\\\\\\\///////////////\\\\\\\\\\\\\\\\//////////////\\\\\\\\\\\\\-->
+
+	<!-- save rviz rviz -->
+	<!-- <node type="rviz" name="rviz" pkg="rviz" args="-d $(find ENTER NAMEOF FILE HERE)/rviz Make_this_lidar_andyolo.rviz" / -->
+	  
+</launch>

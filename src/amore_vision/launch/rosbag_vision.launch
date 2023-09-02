@@ -1,0 +1,14 @@
+<launch>
+  <arg name="bags_directory" value="/home/run/media/sensor_jetson/bags"/>
+
+
+<!-- COMMENTED OUT BUT THIS IS FOR SETTING DIRECTORY TO RECORD IN IDK HOE TO DURATION YET -->
+    <node name="rosbag_lidar" pkg="rosbag" type="record"
+        args="record -O --duration=10 $(arg bags_directory) /velodyne_points /scan"/>
+
+    <node name="rosbag_camera" pkg="rosbag" type="record"
+        args="record -O --duration=10 $(arg bags_directory) /Filtered/IMG_GREEN /Filtered/IMG_RED /zed2i/zed_node/rgb_raw/image_raw_color /search_area"/>
+
+
+   
+</launch>

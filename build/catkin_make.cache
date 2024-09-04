@@ -1,0 +1,2 @@
+amore_vision:velodyne/velodyne:velodyne/velodyne_driver:velodyne/velodyne_laserscan:velodyne/velodyne_msgs:velodyne/velodyne_pcl:velodyne/velodyne_pointcloud:yolov7-ros:zed-ros-wrapper/zed-ros-interfaces:zed-ros-wrapper/zed_nodelets:zed-ros-wrapper/zed_ros:zed-ros-wrapper/zed_wrapper
+-DCATKIN_DEVEL_PREFIX=/home/sensor_jetson/amore_vision/devel -DCMAKE_INSTALL_PREFIX=/home/sensor_jetson/amore_vision/install -G Unix Makefiles

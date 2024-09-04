@@ -1,0 +1,9 @@
+float32 x 
+float32 y
+int8 status
+int8 percent
+int8 min_x 
+int8 min_y
+int8 max_x 
+int8 max_y
+float32 grid_size

@@ -1,0 +1,2 @@
+- setup-file:
+    local-name: /home/sensor_jetson/amore_vision/install/setup.sh

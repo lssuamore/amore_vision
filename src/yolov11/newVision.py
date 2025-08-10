@@ -6,6 +6,9 @@ class visionLogic:
         self.model = yolo(model)
         self.video = cv.VideoCapture(video_path)
 
+        # important data
+        self.midpoint = None
+
     def getColors(self, cls_num):
         base_colors = [(0, 255, 0), (0, 0, 255), (255, 0, 0)]
         color_index = cls_num % len(base_colors)
@@ -62,6 +65,8 @@ class visionLogic:
                     rc = data['center']
         if gc and rc:
             cv.line(frame, gc, rc, (255, 255, 0), 2)
+            self.midpoint = ((gc[0]+rc[0])//2, (gc[1]+rc[1])//2) # in case we need the specific coordinates of the midpoint
+            cv.circle(frame, self.midpoint, 5, (255, 255, 0), -1)
 
     def run(self):
         ret, frame = self.video.read()

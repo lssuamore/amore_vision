@@ -1,10 +1,15 @@
 from ultralytics import YOLO as yolo
 import cv2 as cv
+import pyzed.sl as sl
+import numpy as np
 
 class visionLogic:
     def __init__(self, model, video_path):
         self.model = yolo(model)
         self.video = cv.VideoCapture(video_path)
+
+        # parameters
+
 
         # important data
         self.midpoint = None
@@ -25,7 +30,7 @@ class visionLogic:
                    color,
                    2)
 
-    def process_frame(self, results, frame):
+    def process_frame(self, results, frame, pt_cloud):
 
         gc,rc,nc,ec,sc,wc = None, None, None, None, None, None
         g_cls,r_cls,n_cls,e_cls,s_cls,w_cls = 0,1,2,3,4,5
@@ -61,26 +66,64 @@ class visionLogic:
                 self.drawRectangle(x1,y1,x2,y2,frame,color,class_name,box)
                 if cls == g_cls:
                     gc = data['center']
+                    gc_pt = pt_cloud.get_value(gc[0], gc[1])
                 elif cls == r_cls:
                     rc = data['center']
+                    rc_pt = pt_cloud.get_value(rc[0], rc[1])
         if gc and rc:
             cv.line(frame, gc, rc, (255, 255, 0), 2)
             self.midpoint = ((gc[0]+rc[0])//2, (gc[1]+rc[1])//2) # in case we need the specific coordinates of the midpoint
+            midpoint_distance = np.linalg.norm(abs(np.array(gc_pt) - np.array(rc_pt)))
+            print(f"Distance between green and red center: {midpoint_distance:.2f} meters")
             cv.circle(frame, self.midpoint, 5, (255, 255, 0), -1)
 
     def run(self):
-        ret, frame = self.video.read()
+        '''ret, frame = self.video.read()
         results = self.model.track(frame, stream=True)
         self.process_frame(results, frame)
-        cv.imshow('frame', frame)
+        cv.imshow('frame', frame)'''
+        zed = sl.Camera()
+
+        # parameters
+        init_params=sl.InitParameters()
+        init_params.camera_resolution = sl.RESOLUTION.HD1080
+        init_params.coordinate_units = sl.UNIT.METER
+        init_params.depth_mode = sl.DEPTH_MODE.PERFORMANCE
+
+        err = zed.open(init_params)
+        if err != sl.ERROR_CODE.SUCCESS:
+            print(f"Camera Open Error: {err}")
+            return
+        
+        img_zed = sl.Mat()
+        pt_cloud = sl.Mat()
+
+        while True:
+            if zed.grab() == sl.ERROR_CODE.SUCCESS:
+                zed.retrieve_image(img_zed, sl.VIEW.LEFT)
+                zed.retrieve_measure(pt_cloud, sl.MEASURE.XYZ)
+                frame = img_zed.get_data()
+                # Python
+                if frame.shape[2] == 4:
+                    frame = cv.cvtColor(frame, cv.COLOR_BGRA2BGR)
+                results = self.model.track(frame, stream=True)
+                self.process_frame(results, frame, pt_cloud)
+                cv.imshow('ZED Frame', frame)
+            if cv.waitKey(1) & 0xFF == ord('q'):
+                break
+
+        obj_param = sl.ObjectDetectionParameters()
+        obj_param.enable_tracking = True
+        obj_param.enable_segmentation = True
+        obj_param.detection_model = sl.OBJECT_DETECTION_MODEL.MULTI_CLASS_BOX_ACCURATE
+
+
 
 if __name__ == "__main__":
     model = yolo("D:/A. TEAM NODE/runs/detect/train2/weights/best.pt")
     video_path = "D:/A. TEAM NODE/amore_vision/data/video2.mp4"
     vision = visionLogic(model, video_path)
-    while True:
-        vision.run()
-        if cv.waitKey(1) & 0xFF == ord('q'):
-            break
+
+    vision.run()
     vision.video.release()
     cv.destroyAllWindows()

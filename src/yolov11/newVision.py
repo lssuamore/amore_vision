@@ -33,6 +33,7 @@ class visionLogic:
     def process_frame(self, results, frame, pt_cloud):
 
         gc,rc,nc,ec,sc,wc = None, None, None, None, None, None
+        gc_pt, rc_pt, nc_pt, ec_pt, sc_pt, wc_pt = None, None, None, None, None, None
         g_cls,r_cls,n_cls,e_cls,s_cls,w_cls = 0,1,2,3,4,5
 
         for result in results:
@@ -73,9 +74,17 @@ class visionLogic:
         if gc and rc:
             cv.line(frame, gc, rc, (255, 255, 0), 2)
             self.midpoint = ((gc[0]+rc[0])//2, (gc[1]+rc[1])//2) # in case we need the specific coordinates of the midpoint
-            midpoint_distance = np.linalg.norm(abs(np.array(gc_pt) - np.array(rc_pt)))
-            print(f"Distance between green and red center: {midpoint_distance:.2f} meters")
+            '''midpoint_distance = np.linalg.norm(abs(np.array(gc_pt) - np.array(rc_pt)))
+            print(f"Distance between green and red center: {midpoint_distance:.2f} meters")'''
             cv.circle(frame, self.midpoint, 5, (255, 255, 0), -1)
+        if gc and gc_pt and gc_pt[0] == sl.ERROR_CODE.SUCCESS:
+            gc_dist = gc_pt[1][2]
+            cv.putText(frame, f'{gc_dist:.2f} m', (gc[0], gc[1]-10), cv.FONT_HERSHEY_SIMPLEX, 0.7, (0,255,0),2)
+        if rc and rc_pt and rc_pt[0] == sl.ERROR_CODE.SUCCESS:
+            rc_dist = rc_pt[1][2]
+            cv.putText(frame, f'{rc_dist:.2f} m', (rc[0], rc[1]-10), cv.FONT_HERSHEY_SIMPLEX, 0.7, (0,0,255),2)
+
+        xyz_midpoint = [self.midpoint[0], self.midpoint[1], abs((gc_pt[1][2] + rc_pt[1][2]) // 2) if gc_pt and rc_pt else 0]
 
     def run(self):
         '''ret, frame = self.video.read()

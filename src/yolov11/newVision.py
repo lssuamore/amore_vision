@@ -71,6 +71,18 @@ class visionLogic:
                 elif cls == r_cls:
                     rc = data['center']
                     rc_pt = pt_cloud.get_value(rc[0], rc[1])
+                elif cls == n_cls:
+                    nc = data['center']
+                    nc_pt = pt_cloud.get_value(nc[0], nc[1])
+                elif cls == e_cls:
+                    ec = data['center']
+                    ec_pt = pt_cloud.get_value(ec[0], ec[1])
+                elif cls == s_cls:
+                    sc = data['center']
+                    sc_pt = pt_cloud.get_value(sc[0], sc[1])
+                elif cls == w_cls:
+                    wc = data['center']
+                    wc_pt = pt_cloud.get_value(wc[0], wc[1])
         if gc and rc:
             cv.line(frame, gc, rc, (255, 255, 0), 2)
             self.midpoint = ((gc[0]+rc[0])//2, (gc[1]+rc[1])//2) # in case we need the specific coordinates of the midpoint
@@ -85,6 +97,7 @@ class visionLogic:
             cv.putText(frame, f'{rc_dist:.2f} m', (rc[0], rc[1]-10), cv.FONT_HERSHEY_SIMPLEX, 0.7, (0,0,255),2)
 
         xyz_midpoint = [self.midpoint[0], self.midpoint[1], abs((gc_pt[1][2] + rc_pt[1][2]) // 2) if gc_pt and rc_pt else 0]
+        return xyz_midpoint, gc_pt[1], rc_pt[1], nc_pt[1], ec_pt[1], sc_pt[1], wc_pt[1]
 
     def run(self):
         '''ret, frame = self.video.read()
@@ -116,15 +129,16 @@ class visionLogic:
                 if frame.shape[2] == 4:
                     frame = cv.cvtColor(frame, cv.COLOR_BGRA2BGR)
                 results = self.model.track(frame, stream=True)
-                self.process_frame(results, frame, pt_cloud)
+                xyz_midpoint, gc_pt, rc_pt, nc_pt, ec_pt, sc_pt, wc_pt = self.process_frame(results, frame, pt_cloud)
                 cv.imshow('ZED Frame', frame)
+                return xyz_midpoint, gc_pt, rc_pt, nc_pt, ec_pt, sc_pt, wc_pt
             if cv.waitKey(1) & 0xFF == ord('q'):
                 break
 
-        obj_param = sl.ObjectDetectionParameters()
+        '''obj_param = sl.ObjectDetectionParameters()
         obj_param.enable_tracking = True
         obj_param.enable_segmentation = True
-        obj_param.detection_model = sl.OBJECT_DETECTION_MODEL.MULTI_CLASS_BOX_ACCURATE
+        obj_param.detection_model = sl.OBJECT_DETECTION_MODEL.MULTI_CLASS_BOX_ACCURATE'''
 
 
 
@@ -133,6 +147,6 @@ if __name__ == "__main__":
     video_path = "D:/A. TEAM NODE/amore_vision/data/video2.mp4"
     vision = visionLogic(model, video_path)
 
-    vision.run()
+    xyz_midpoint, gc_pt, rc_pt, nc_pt, ec_pt, sc_pt, wc_pt = vision.run()
     vision.video.release()
     cv.destroyAllWindows()
